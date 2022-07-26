@@ -1,3 +1,4 @@
+import { GoogleLogin } from '@react-oauth/google'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -5,6 +6,8 @@ import React from 'react'
 import Logo from '../utils/tiktik-logo.png'
 
 function Navbar() {
+  const user = false
+
   return (
     <div className='w-full flex justify-between items-center border-b-2 border-gray-200 py-2 px-4'>
         <Link href='/'>
@@ -18,6 +21,19 @@ function Navbar() {
                 />
             </div>
         </Link>
+
+        <div>SEARCH</div>
+
+        <div>
+          {user ? (
+            <div>Logged In</div>
+          ) : (
+            <GoogleLogin 
+              onSuccess={(response) => console.log(response)}
+              onError={() => console.log('Error')}
+            />
+          )}
+        </div>
     </div>
   )
 }
