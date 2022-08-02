@@ -1,9 +1,33 @@
 import React, { useState } from 'react'
 import { FaCloudUploadAlt } from 'react-icons/fa'
+import { SanityAssetDocument } from '@sanity/client'
+
+import { client } from '../utils/client'
 
 function Upload() {
   const [isLoading, setIsLoading] = useState(false)
-  const [videoAsset, setVideoAsset] = useState()
+  const [videoAsset, setVideoAsset] = useState<SanityAssetDocument | undefined>()
+  const [wrongFileType, setWrongFileType] = useState(false)
+
+  async function uploadVideo(e: any) {
+      const selectedFile = e.target.files[0]
+      const fileTypes = ['video/mp4', 'video/webm', 'video/ogg']
+
+      if(fileTypes.includes(selectedFile.type)) {
+        setIsLoading(true)
+        client.assets.upload('file', selectedFile, {
+          contentType: selectedFile.type,
+          filename: selectedFile.name,
+        })
+        .then((data) => {
+          setVideoAsset(data)
+          setIsLoading(false)
+        })
+      } else {
+        setIsLoading(false)
+        setWrongFileType(true)
+      }
+  }
 
   return (
     <div className='flex w-full h-full'>
@@ -20,7 +44,12 @@ function Upload() {
               <div>
                 {videoAsset ? (
                   <div>
-
+                    <video 
+                      src={videoAsset.url} 
+                      loop
+                      controls
+                      className='rounded-xl h-[450px] mt-16 bg-black'
+                    />
                   </div>
                 ) : (
                   <label className='cursor-pointer'>
@@ -40,6 +69,12 @@ function Upload() {
                       <p className='bg-[#F51997] text-center mt-10 rounded text-white text-md font-medium p-2 w-52 outline-none'>
                         Select File
                       </p>
+                      <input 
+                        type='file' 
+                        name='upload-video'  
+                        className='w-0 h-0'
+                        onChange={uploadVideo}
+                      />
                     </div>
                   </label>
                 )}
